@@ -1,12 +1,11 @@
 package com.kang.nanohttpddemo.webserver
 
-import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
-import com.kang.nanohttpddemo.R
 import fi.iki.elonen.NanoHTTPD
 import java.io.InputStream
 import java.security.KeyStore
+import java.util.logging.Level
+import java.util.logging.Logger
 import javax.net.ssl.KeyManagerFactory
 
 /**
@@ -14,18 +13,16 @@ import javax.net.ssl.KeyManagerFactory
  * Author: SunBinKang
  * Description:
  */
-class HttpServer(hostname: String?, port: Int) : NanoHTTPD(hostname, port) {//继承NanoHTTPD
-
+class HttpServer(hostname: String?, port: Int) : NanoHTTPD(hostname, port) {  //继承NanoHTTPD
     private val TAG = "binkang"
+    private var logger: Logger = Logger.getLogger(TAG)
     private var count = 0 //用于记录请求为第几次
     private var mGson: Gson = Gson() //用于记录请求为第几次
 
     //注释一下这段代码就是http server,加上就是https server,但是是自签名的证书
     //服务器信任的客户端证书
-    constructor(context: Context, hostname: String?, port: Int) : this(hostname, port) {
-        //从文件中拿到流对象
-        val keystoreStream: InputStream =
-            context.resources.openRawResource(R.raw.keystore)
+    constructor(keystoreStream: InputStream, hostname: String?, port: Int) : this(hostname, port) {
+
         //拿到keystore对象
         val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
         //keystore加载流对象，并把storepass参数传入
@@ -44,11 +41,8 @@ class HttpServer(hostname: String?, port: Int) : NanoHTTPD(hostname, port) {//�
 
     private fun dealWith(session: IHTTPSession?): Response {
         //日志输出外部请求相关的日志信息
-        Log.i(
-            TAG,
-            "dealWith: session.uri = ${session?.uri}, method = ${session?.method}, header = ${session?.headers}, " +
-                    "params = ${session?.parameters}"
-        )
+        logger.log(Level.INFO, "dealWith: session.uri = ${session?.uri}, method = ${session?.method}, header = ${session?.headers}, " +
+                "params = ${session?.parameters}")
         //响应get请求
         if (Method.GET == session?.method) {
 
@@ -93,7 +87,7 @@ class HttpServer(hostname: String?, port: Int) : NanoHTTPD(hostname, port) {//�
 
     private fun <T : Any> responseJsonString(code: Int, data: T, msg: String): Response {
         val response = Responser<T>(code, data, msg)
-        Log.i(TAG, "responseJsonString: $response")
+        logger.log(Level.INFO, "responseJsonString: $response")
         return newFixedLengthResponse(mGson.toJson(response))//返回对应的响应体Response
     }
 }

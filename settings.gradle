@@ -1,2 +1,4 @@
 rootProject.name = "NanoHttpdDemo"
 include ':app'
+include ':httpServer'
+include ':server'

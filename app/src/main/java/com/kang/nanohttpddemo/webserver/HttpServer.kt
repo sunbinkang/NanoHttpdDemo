@@ -22,10 +22,8 @@ class HttpServer(hostname: String?, port: Int) : NanoHTTPD(hostname, port) {//�
 
     //注释一下这段代码就是http server,加上就是https server,但是是自签名的证书
     //服务器信任的客户端证书
-    constructor(context: Context, hostname: String?, port: Int) : this(hostname, port) {
-        //从文件中拿到流对象
-        val keystoreStream: InputStream =
-            context.resources.openRawResource(R.raw.keystore)
+    constructor(keystoreStream: InputStream, hostname: String?, port: Int) : this(hostname, port) {
+
         //拿到keystore对象
         val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
         //keystore加载流对象，并把storepass参数传入
